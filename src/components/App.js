@@ -1,82 +1,108 @@
-import React, { Component } from "react";
-import axios from "axios";
-import Searchbar from "./Searchbar";
-import ImageGallery from "./ImageGallery";
-import Modal from "./Modal";
+import { Component } from 'react';
+import { Searchbar } from './Searchbar';
+import { fetchImages } from './pixabayAPI';
+import { ImageGallery } from './ImageGallery';
+import { Button } from './Button';
+import { Loader } from './Loader';
+import { Modal } from './Modal';
+import './styles.css';
 
-class App extends Component {
+export class App extends Component {
   state = {
-    query: "",
     images: [],
-    selectedImage: null,
-    page: 1,
+    isLoading: false,
+    currentSearch: '',
+    pageNr: 1,
+    modalOpen: false,
+    modalImg: '',
+    modalAlt: '',
   };
 
-  handleSearch = (query) => {
-    const apiKey = "34227355-634b3cfb76d00133b4cb8e037";
-    const url = `https://pixabay.com/api/?key=${apiKey}&q=${encodeURIComponent(query)}&page=${this.state.page}&per_page=12`;
-
-    axios
-      .get(url)
-      .then((response) => {
-        const images = response.data.hits;
-        this.setState({ query, images, page: 1 });
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+  handleSubmit = async e => {
+    e.preventDefault();
+    this.setState({ isLoading: true });
+    const inputForSearch = e.target.elements.inputForSearch;
+    if (inputForSearch.value.trim() === '') {
+      return;
+    }
+    const response = await fetchImages(inputForSearch.value, 1);
+    this.setState({
+      images: response,
+      isLoading: false,
+      currentSearch: inputForSearch.value,
+      pageNr: 1,
+    });
   };
 
-  handleImageClick = (image) => {
-    this.setState({ selectedImage: image });
+  handleClickMore = async () => {
+    const response = await fetchImages(
+      this.state.currentSearch,
+      this.state.pageNr + 1
+    );
+    this.setState({
+      images: [...this.state.images, ...response],
+      pageNr: this.state.pageNr + 1,
+    });
   };
 
-  handleCloseModal = () => {
-    this.setState({ selectedImage: null });
+  handleImageClick = e => {
+    this.setState({
+      modalOpen: true,
+      modalAlt: e.target.alt,
+      modalImg: e.target.name,
+    });
   };
 
-  handleLoadMore = () => {
-    const apiKey = "34227355-634b3cfb76d00133b4cb8e037";
-    const url = `https://pixabay.com/api/?key=${apiKey}&q=${encodeURIComponent(
-      this.state.query
-    )}&page=${this.state.page + 1}&per_page=12`;
-
-    axios
-      .get(url)
-      .then((response) => {
-        const newImages = response.data.hits;
-        this.setState((prevState) => ({
-          images: [...prevState.images, ...newImages],
-          page: prevState.page + 1,
-        }));
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+  handleModalClose = () => {
+    this.setState({
+      modalOpen: false,
+      modalImg: '',
+      modalAlt: '',
+    });
   };
+
+  handleKeyDown = event => {
+    if (event.code === 'Escape') {
+      this.handleModalClose();
+    }
+  };
+
+  async componentDidMount() {
+    window.addEventListener('keydown', this.handleKeyDown);
+  }
 
   render() {
-    const { images, selectedImage } = this.state;
-
     return (
-      <div>
-        <Searchbar onSubmit={this.handleSearch} />
-
-        <ImageGallery images={images} onImageClick={this.handleImageClick} />
-
-        {selectedImage && (
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: '1fr',
+          gridGap: '16px',
+          paddingBottom: '24px',
+        }}
+      >
+        {this.state.isLoading ? (
+          <Loader />
+        ) : (
+          <div>
+            <Searchbar onSubmit={this.handleSubmit} />
+            <ImageGallery
+              onImageClick={this.handleImageClick}
+              images={this.state.images}
+            />
+            {this.state.images.length > 0 ? (
+              <Button onClick={this.handleClickMore} />
+            ) : null}
+          </div>
+        )}
+        {this.state.modalOpen ? (
           <Modal
-            selectedImage={selectedImage}
-            onCloseModal={this.handleCloseModal}
+            src={this.state.modalImg}
+            alt={this.state.modalAlt}
+            handleClose={this.handleModalClose}
           />
-        )}
-
-        {images.length > 0 && (
-          <button onClick={this.handleLoadMore}>Load More</button>
-        )}
+        ) : null}
       </div>
     );
   }
 }
-
-export default App;

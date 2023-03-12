@@ -1,12 +1,19 @@
-import React from "react";
-import ImageGalleryItem from "./ImageGalleryItem";
+import { ImageGalleryItem } from './ImageGalleryItem';
+import propTypes from 'prop-types';
 
-const ImageGallery = ({ images, onOpenModal }) => (
-  <ul className="gallery">
-    {images.map((image) => (
-      <ImageGalleryItem key={image.id} image={image} onOpenModal={onOpenModal} />
+export const ImageGallery = ({ images, onImageClick }) => (
+  <ul className={ImageGallery}>
+    {images.map((image, index) => (
+      <ImageGalleryItem onclick={onImageClick} image={image} key={index} />
     ))}
   </ul>
 );
 
-export default ImageGallery;
+ImageGallery.propTypes = {
+  images: propTypes.arrayOf(
+    propTypes.shape({
+      id: propTypes.number.isRequired,
+    })
+  ),
+  onImageClick: propTypes.func.isRequired,
+};

@@ -1,11 +1,15 @@
-import React from "react";
+import propTypes from 'prop-types';
 
-const Modal = ({ selectedImage, onCloseModal }) => (
-  <div className="overlay" onClick={onCloseModal}>
-    <div className="modal">
-      <img src={selectedImage.largeImageURL} alt={selectedImage.tags} />
+export const Modal = ({ src, alt, handleClose }) => (
+  <div class="overlay" onClick={handleClose}>
+    <div class="modal">
+      <img src={src} alt={alt} />
     </div>
   </div>
 );
 
-export default Modal;
+Modal.propTypes = {
+  src: propTypes.string.isRequired,
+  alt: propTypes.string.isRequired,
+  handleClose: propTypes.func.isRequired,
+};

@@ -1,12 +1,16 @@
-const ImageGalleryItem = ({ image, onOpenModal }) => (
-  <li className="gallery-item">
+import propTypes from 'prop-types';
+
+export const ImageGalleryItem = ({ image, onclick }) => (
+  <li class="gallery-item" id={image.id} onClick={onclick}>
     <img
       src={image.webformatURL}
       alt={image.tags}
-      className="gallery-item__image"
-      onClick={() => onOpenModal(image)}
+      name={image.largeImageURL}
     />
   </li>
 );
 
-export default ImageGalleryItem;
+ImageGalleryItem.propTypes = {
+  image: propTypes.object.isRequired,
+  onclick: propTypes.func.isRequired,
+};
