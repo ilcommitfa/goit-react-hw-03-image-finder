@@ -5,6 +5,7 @@ import ImageGalleryItem from './ImageGalleryItem';
 import Loader from './Loader';
 import Button from './Button';
 import Modal from './Modal';
+import './styles.css';
 
 class App extends Component {
   state = {
@@ -64,7 +65,7 @@ class App extends Component {
   render() {
     const { images, isLoading, showModal, largeImageURL } = this.state;
     return (
-      <div>
+      <div class="App">
         <Searchbar onSubmit={this.onChangeQuery} />
         <ImageGallery>
           {images.map(({ id, webformatURL, largeImageURL }) => (

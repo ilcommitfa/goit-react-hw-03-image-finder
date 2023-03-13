@@ -1,5 +1,5 @@
 const ImageGalleryItem = ({ webformatURL, onImageClick }) => (
-  <li className="gallery-item">
+  <li class="gallery-item">
     <img src={webformatURL} alt="" onClick={onImageClick} />
   </li>
 );

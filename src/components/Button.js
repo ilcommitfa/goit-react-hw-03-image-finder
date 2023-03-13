@@ -1,6 +1,6 @@
 const Button = ({ onClick }) => (
-  <button type="button" className="button" onClick={onClick}>
-    <span className="button-label">Load more</span>
+  <button type="button" class="button" onClick={onClick}>
+    <span class="button-label">Load more</span>
   </button>
 );
 
