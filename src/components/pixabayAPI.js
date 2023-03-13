@@ -7,10 +7,9 @@ export const fetchImages = async (inputValue, pageNr) => {
   );
   return response.data.hits.map(image => {
     return {
-      id: image.id,
-      webformatURL: image.webformatURL,
-      largeImageURL: image.largeImageURL,
-      tags: image.tags,
+    id: image.id,
+    webformatURL: image.webformatURL,
+    largeImageURL: image.largeImageURL
     };
   });
 };

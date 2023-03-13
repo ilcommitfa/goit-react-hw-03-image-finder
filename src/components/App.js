@@ -1,108 +1,93 @@
-import { Component } from 'react';
-import { Searchbar } from './Searchbar';
-import { fetchImages } from './pixabayAPI';
-import { ImageGallery } from './ImageGallery';
-import { Button } from './Button';
-import { Loader } from './Loader';
-import { Modal } from './Modal';
-import './styles.css';
+import React, { Component } from 'react';
+import Searchbar from './Searchbar';
+import ImageGallery from './ImageGallery';
+import ImageGalleryItem from './ImageGalleryItem';
+import Loader from './Loader';
+import Button from './Button';
+import Modal from './Modal';
 
-export class App extends Component {
+class App extends Component {
   state = {
     images: [],
+    currentPage: 1,
+    searchQuery: '',
     isLoading: false,
-    currentSearch: '',
-    pageNr: 1,
-    modalOpen: false,
-    modalImg: '',
-    modalAlt: '',
+    showModal: false,
+    largeImageURL: '',
   };
 
-  handleSubmit = async e => {
-    e.preventDefault();
-    this.setState({ isLoading: true });
-    const inputForSearch = e.target.elements.inputForSearch;
-    if (inputForSearch.value.trim() === '') {
-      return;
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState.searchQuery !== this.state.searchQuery) {
+      this.fetchImages();
     }
-    const response = await fetchImages(inputForSearch.value, 1);
-    this.setState({
-      images: response,
-      isLoading: false,
-      currentSearch: inputForSearch.value,
-      pageNr: 1,
-    });
-  };
-
-  handleClickMore = async () => {
-    const response = await fetchImages(
-      this.state.currentSearch,
-      this.state.pageNr + 1
-    );
-    this.setState({
-      images: [...this.state.images, ...response],
-      pageNr: this.state.pageNr + 1,
-    });
-  };
-
-  handleImageClick = e => {
-    this.setState({
-      modalOpen: true,
-      modalAlt: e.target.alt,
-      modalImg: e.target.name,
-    });
-  };
-
-  handleModalClose = () => {
-    this.setState({
-      modalOpen: false,
-      modalImg: '',
-      modalAlt: '',
-    });
-  };
-
-  handleKeyDown = event => {
-    if (event.code === 'Escape') {
-      this.handleModalClose();
-    }
-  };
-
-  async componentDidMount() {
-    window.addEventListener('keydown', this.handleKeyDown);
   }
 
+  onChangeQuery = query => {
+    this.setState({
+      searchQuery: query,
+      currentPage: 1,
+      images: [],
+      error: null,
+    });
+  };
+
+  fetchImages = () => {
+    const { currentPage, searchQuery } = this.state;
+    const apiKey = '34227355-634b3cfb76d00133b4cb8e037';
+    const url = `https://pixabay.com/api/?q=${searchQuery}&page=${currentPage}&key=${apiKey}&image_type=photo&orientation=horizontal&per_page=12`;
+
+    this.setState({ isLoading: true });
+
+    fetch(url)
+      .then(response => response.json())
+      .then(data => {
+        this.setState(prevState => ({
+          images: [...prevState.images, ...data.hits],
+          currentPage: prevState.currentPage + 1,
+        }));
+        if (data.hits.length === 0) {
+          alert('No more images found!');
+        }
+      })
+      .catch(error => this.setState({ error }))
+      .finally(() => this.setState({ isLoading: false }));
+  };
+
+  openModal = largeImageURL => {
+    this.setState({ showModal: true, largeImageURL });
+  };
+
+  closeModal = () => {
+    this.setState({ showModal: false });
+  };
+
   render() {
+    const { images, isLoading, showModal, largeImageURL } = this.state;
     return (
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr',
-          gridGap: '16px',
-          paddingBottom: '24px',
-        }}
-      >
-        {this.state.isLoading ? (
-          <Loader />
-        ) : (
-          <div>
-            <Searchbar onSubmit={this.handleSubmit} />
-            <ImageGallery
-              onImageClick={this.handleImageClick}
-              images={this.state.images}
+      <div>
+        <Searchbar onSubmit={this.onChangeQuery} />
+        <ImageGallery>
+          {images.map(({ id, webformatURL, largeImageURL }) => (
+            <ImageGalleryItem
+              key={id}
+              webformatURL={webformatURL}
+              largeImageURL={largeImageURL}
+              onClick={this.openModal}
             />
-            {this.state.images.length > 0 ? (
-              <Button onClick={this.handleClickMore} />
-            ) : null}
-          </div>
+          ))}
+        </ImageGallery>
+        {isLoading && <Loader />}
+        {images.length > 0 && !isLoading && (
+          <Button onClick={this.fetchImages} />
         )}
-        {this.state.modalOpen ? (
-          <Modal
-            src={this.state.modalImg}
-            alt={this.state.modalAlt}
-            handleClose={this.handleModalClose}
-          />
-        ) : null}
+        {showModal && (
+          <Modal onClose={this.closeModal}>
+            <img src={largeImageURL} alt="" />
+          </Modal>
+        )}
       </div>
     );
   }
 }
+
+export default App;
