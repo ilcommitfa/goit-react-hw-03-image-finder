@@ -1,19 +1,18 @@
-import {MagnifyingGlass} from 'react-loader-spinner';
+import {ThreeDots} from 'react-loader-spinner';
 
 const Loader = () => {
   return (
     <div className="loader">
-      {/* Показати спінер */}
-      <MagnifyingGlass
-          visible={true}
-          height="80"
-          width="80"
-          ariaLabel="MagnifyingGlass-loading"
+      <ThreeDots 
+          height="80" 
+          width="80" 
+          radius="9"
+          color="#4fa94d" 
+          ariaLabel="three-dots-loading"
           wrapperStyle={{}}
-          wrapperClass="MagnifyingGlass-wrapper"
-          glassColor = '#c0efff'
-          color = '#e15b64'
-        />
+          wrapperClassName=""
+          visible={true}
+      />
     </div>
   );
 };
