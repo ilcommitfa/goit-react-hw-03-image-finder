@@ -1,4 +1,5 @@
 import { Component } from 'react';
+import { BsSearch } from 'react-icons/bs';
 
 class Searchbar extends Component {
   // Створити стан для значення інпута
@@ -26,6 +27,7 @@ class Searchbar extends Component {
       <header className="Searchbar">
         <form className="SearchForm" onSubmit={this.handleSubmit}>
           <button type="submit" className="SearchForm-button">
+            <BsSearch />
             <span className="SearchForm-button-label">Search</span>
           </button>
 

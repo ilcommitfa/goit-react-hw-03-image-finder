@@ -11,7 +11,6 @@ class ImageGallery extends Component {
         {images.map((image) => (
           <ImageGalleryItem
             key={image.id}
-            id={image.id}
             webformatURL={image.webformatURL}
             largeImageURL={image.largeImageURL}
             onClick={this.props.onClick}
