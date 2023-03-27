@@ -19,11 +19,11 @@ class App extends Component {
 
   componentDidUpdate(prevProps, prevState) {
     if (prevState.query !== this.state.query) {
-      this.fetchImages();
+      this.searchImages();
     }
   }
 
-  fetchImages = async () => {
+  searchImages = async () => {
     const { query, page } = this.state;
 
     this.setState({ loading: true });
@@ -43,15 +43,15 @@ class App extends Component {
     }
   };
 
-  handleSearch = query => {
+  handleSearchSubmit = query => {
     this.setState({ query, images: [], page: 1 });
   };
 
   handleLoadMore = () => {
-    this.fetchImages();
+    this.searchImages();
   };
 
-  handleSelect = url => {
+  handleOpenModal = url => {
     this.setState({ showModal: true, selectedImage: url });
   };
 
@@ -64,11 +64,11 @@ class App extends Component {
 
     return (
       <div className="App">
-        <Searchbar onSubmit={this.handleSearch} />
+        <Searchbar onSubmit={this.handleSearchSubmit} />
 
         {error && <p>{error}</p>}
 
-        <ImageGallery images={images} onSelect={this.handleSelect} />
+        <ImageGallery images={images} onSelect={this.handleOpenModal} />
 
         {loading && <Loader />}
 

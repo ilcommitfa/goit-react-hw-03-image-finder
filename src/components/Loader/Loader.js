@@ -1,4 +1,5 @@
 import {ThreeDots} from 'react-loader-spinner';
+import PropTypes from 'prop-types';
 
 const Loader = () => {
   return (
@@ -16,5 +17,16 @@ const Loader = () => {
     </div>
   );
 };
+
+Loader.propTypes = {
+  height: PropTypes.number,
+  width: PropTypes.number,
+  radius: PropTypes.number,
+  color: PropTypes.string,
+  ariaLabel: PropTypes.string,
+  wrapperStyle: PropTypes.object,
+  wrapperClassName: PropTypes.string,
+  visible: PropTypes.bool,
+  };
 
 export default Loader;
